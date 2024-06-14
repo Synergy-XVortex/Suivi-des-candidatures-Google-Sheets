@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    .form-container {
+      max-width: 400px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      background-color: #f9f9f9;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="url"], select {
+      width: calc(100% - 22px);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input[type="button"] {
+      width: 100%;
+      padding: 10px;
+      background-color: #007BFF;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input[type="button"]:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-container">
+    <h2>Ajouter une candidature</h2>
+    <form id="form">
+      <div class="form-group">
+        <label for="entreprise">Choisir ou ajouter une entreprise :</label>
+        <select id="entreprise" name="entreprise">
+          <!-- Options dynamiquement générées -->
+        </select>
+        <input type="text" id="nouvelleEntreprise" name="nouvelleEntreprise" placeholder="Nouvelle entreprise">
+        <input type="button" value="Ajouter" onclick="ajouterNouvelleEntreprise()">
+      </div>
+      <div class="form-group">
+        <label for="titre">Titre de l'offre :</label>
+        <input type="text" id="titre" name="titre" required>
+      </div>
+      <div class="form-group">
+        <label for="lien">Lien de l'offre :</label>
+        <input type="url" id="lien" name="lien" required>
+      </div>
+      <input type="button" value="Ajouter Candidature" onclick="submitForm()">
+    </form>
+  </div>
+  <script>
+    function chargerEntreprises(entreprises) {
+      var selectEntreprise = document.getElementById('entreprise');
+      selectEntreprise.innerHTML = ''; // Vide le menu déroulant
+      
+      // Utiliser un Set pour éviter les doublons
+      var entrepriseSet = new Set(entreprises);
+      
+      // Convertir le Set en tableau et trier par ordre alphabétique
+      var entreprisesTrie = Array.from(entrepriseSet).sort(Intl.Collator().compare);
+      
+      entreprisesTrie.forEach(function(entreprise) {
+        var option = document.createElement('option');
+        option.value = entreprise;
+        option.textContent = entreprise;
+        selectEntreprise.appendChild(option);
+      });
+    }
+    
+    function ajouterNouvelleEntreprise() {
+      var nouvelleEntreprise = document.getElementById('nouvelleEntreprise').value.trim();
+      
+      if (nouvelleEntreprise !== '') {
+        google.script.run.withSuccessHandler(function(entreprises) {
+          chargerEntreprises(entreprises);
+          // Sélectionne la nouvelle entreprise ajoutée
+          document.getElementById('entreprise').value = nouvelleEntreprise;
+          // Efface le champ de nouvelle entreprise
+          document.getElementById('nouvelleEntreprise').value = '';
+        }).ajouterNouvelleEntreprise(nouvelleEntreprise);
+      }
+    }
+
+    
+    function submitForm() {
+      var entrepriseSelect = document.getElementById('entreprise').value;
+      var titre = document.getElementById('titre').value;
+      var lien = document.getElementById('lien').value;
+      
+      google.script.run.ajouterCandidatureAvecValeurs(entrepriseSelect, titre, lien);
+      google.script.host.close();
+    }
+    
+    google.script.run.withSuccessHandler(chargerEntreprises).getEntreprises();
+  </script>
+</body>
+</html>
