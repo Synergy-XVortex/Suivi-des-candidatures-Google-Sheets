@@ -15,22 +15,30 @@ function afficherDialogue() {
 function ajouterCandidatureAvecValeurs(entreprise, titre, lien) {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
   
-  // Trouver la première cellule vide dans la colonne E
-  var range = sheet.getRange('E:E');
-  var values = range.getValues();
-  var nextRow = values.findIndex(row => !row[0]) + 1; // +1 car les index sont basés sur 0
-  
-  // Ajouter l'entreprise dans la colonne B
-  sheet.getRange(nextRow, 2).setValue(entreprise); // Colonne B pour l'entreprise
-  copyFormatting(); // Applique la couleur
-  
-  // Ajouter le titre et le lien et la date dans les colonnes masquées E et F et G
-  sheet.getRange(nextRow, 5).setValue(titre); // Colonne E pour le titre
-  sheet.getRange(nextRow, 6).setValue(lien);  // Colonne F pour le lien
-  sheet.getRange(nextRow, 7).setValue(new Date()); // Colonne G pour la date
-  
-  // Mettre à jour la colonne D avec "En Attente"
-  sheet.getRange(nextRow, 4).setValue("En Attente");
+  try {
+    // Trouver la première cellule vide dans la colonne E
+    var range = sheet.getRange('E:E');
+    var values = range.getValues();
+    var nextRow = values.findIndex(row => !row[0]) + 1; // +1 car les index sont basés sur 0
+    
+    // Ajouter l'entreprise dans la colonne B
+    sheet.getRange(nextRow, 2).setValue(entreprise); // Colonne B pour l'entreprise
+    
+    // Copie de la mise en forme
+    copyFormatting();
+    
+    // Ajouter le titre, le lien et la date dans les colonnes masquées E, F et G
+    sheet.getRange(nextRow, 5).setValue(titre); // Colonne E pour le titre
+    sheet.getRange(nextRow, 6).setValue(lien);  // Colonne F pour le lien
+    sheet.getRange(nextRow, 7).setValue(new Date()); // Colonne G pour la date
+    
+    // Mettre à jour la colonne D avec "En Attente"
+    sheet.getRange(nextRow, 4).setValue("En Attente");
+  } catch (error) {
+    Logger.log("Erreur lors de l'ajout de la candidature : " + error);
+    // Vous pouvez ajouter ici une notification ou un traitement spécifique en cas d'erreur
+    throw new Error("Erreur lors de l'ajout de la candidature : " + error);
+  }
 }
 
 // Fonction pour ajouter une nouvelle entreprise
