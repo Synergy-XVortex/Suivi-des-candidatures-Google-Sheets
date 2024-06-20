@@ -95,24 +95,34 @@
       var nouvelleEntreprise = document.getElementById('nouvelleEntreprise').value.trim();
       
       if (nouvelleEntreprise !== '') {
-        google.script.run.withSuccessHandler(function(entreprises) {
-          chargerEntreprises(entreprises);
-          // Sélectionne la nouvelle entreprise ajoutée
-          document.getElementById('entreprise').value = nouvelleEntreprise;
-          // Efface le champ de nouvelle entreprise
-          document.getElementById('nouvelleEntreprise').value = '';
-        }).ajouterNouvelleEntreprise(nouvelleEntreprise);
+        google.script.run
+          .withSuccessHandler(function(entreprises) {
+            chargerEntreprises(entreprises);
+            document.getElementById('entreprise').value = nouvelleEntreprise;
+            document.getElementById('nouvelleEntreprise').value = '';
+          })
+          .withFailureHandler(function(error) {
+            console.error("Erreur lors de l'ajout de nouvelle entreprise : " + error.message);
+            // Vous pouvez ajouter une notification à l'utilisateur ici
+          })
+          .ajouterNouvelleEntreprise(nouvelleEntreprise);
       }
     }
 
-    
     function submitForm() {
       var entrepriseSelect = document.getElementById('entreprise').value;
       var titre = document.getElementById('titre').value;
       var lien = document.getElementById('lien').value;
       
-      google.script.run.ajouterCandidatureAvecValeurs(entrepriseSelect, titre, lien);
-      google.script.host.close();
+      google.script.run
+        .withSuccessHandler(function() {
+          google.script.host.close();
+        })
+        .withFailureHandler(function(error) {
+          console.error("Erreur lors de l'ajout de la candidature : " + error.message);
+          // Vous pouvez ajouter une notification à l'utilisateur ici
+        })
+        .ajouterCandidatureAvecValeurs(entrepriseSelect, titre, lien);
     }
     
     google.script.run.withSuccessHandler(chargerEntreprises).getEntreprises();
