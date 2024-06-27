@@ -62,6 +62,9 @@ function ajouterNouvelleEntreprise(nouvelleEntreprise) {
     // Ajoute la nouvelle entreprise à la feuille de calcul dans la colonne A
     sheet.getRange(lastEmptyRowInA, 1).setValue(nouvelleEntreprise);
 
+    //Trie la colonne A
+    SpreadsheetApp.getActive().getRange('A:A').activate().sort({column: 1, ascending: true});
+    
     // Ajoute la nouvelle entreprise à la liste déroulante
     var cell = SpreadsheetApp.getActive().getRange('A1:B1000');
     var range = SpreadsheetApp.getActive().getRange('A1:B1000');
